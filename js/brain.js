@@ -3,7 +3,7 @@
  */
 const MarbleBrain = (() => {
   const MIN_SECONDARY_SHARE = 0.18;
-  const RECENT_MAX = 8;
+  const RECENT_MAX = 14;
   const recent = new Map();
 
   function brain() { return I18n.getBrain(); }
@@ -100,7 +100,7 @@ const MarbleBrain = (() => {
     }
 
     if (analysis.hasNeutralLook) {
-      const pool = [...(b.colorComments[colors[0]] || []), ...(b.neutralLook || [])];
+      const pool = mergePool('neutralLook').concat(b.colorComments[colors[0]] || []);
       return fill(pickUnique(pool, `neutral:${colors[0]}`), name);
     }
 
