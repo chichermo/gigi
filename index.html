@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f0f1a" />
+  <meta name="description" content="Tu espejo inteligente personal — opiniones, cumplidos y estilo por voz" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Marble — Tu Espejo Inteligente</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="screen-welcome" class="screen active">
+      <div class="welcome-content">
+        <div class="logo-ring">
+          <span class="logo-icon">✨</span>
+        </div>
+        <h1 id="app-title">Marble</h1>
+        <p class="tagline" data-i18n="tagline"></p>
+        <p class="subtitle" data-i18n="subtitle"></p>
+
+        <div class="lang-picker">
+          <label for="lang-select" data-i18n="languageLabel"></label>
+          <select id="lang-select" aria-label="Language">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="nl">Nederlands</option>
+          </select>
+        </div>
+
+        <div class="voice-picker">
+          <label data-i18n="voiceLabel"></label>
+          <div id="voice-mobile-info" class="voice-mobile-info hidden">
+            <p class="voice-mobile-title" data-i18n="voiceMobileTitle"></p>
+            <p class="voice-mobile-text" id="voice-mobile-guide"></p>
+          </div>
+          <p id="voice-desktop-note" class="voice-desktop-note hidden" data-i18n="voiceMobileDesktopNote"></p>
+          <label class="voice-filter">
+            <input type="checkbox" id="voice-female-only" checked />
+            <span data-i18n="voiceFemaleOnly"></span>
+          </label>
+          <label class="voice-filter" id="voice-phone-filter-wrap">
+            <input type="checkbox" id="voice-phone-only" checked />
+            <span data-i18n="voicePhoneOnly"></span>
+          </label>
+          <p class="voice-hint" data-i18n="voiceSelectHint"></p>
+          <ul id="voice-list-welcome" class="voice-list" role="listbox" aria-label="Voces"></ul>
+        </div>
+
+        <button id="btn-start" class="btn-primary">
+          <span class="btn-icon">🎙️</span>
+          <span id="btn-start-label" data-i18n="btnStart"></span>
+        </button>
+        <p class="hint" data-i18n="hint"></p>
+      </div>
+    </section>
+
+    <section id="screen-mirror" class="screen">
+      <div class="mirror-container">
+        <video id="camera" autoplay playsinline muted></video>
+        <canvas id="snapshot" hidden></canvas>
+
+        <div class="mirror-overlay">
+          <header class="mirror-header">
+            <div class="header-left">
+              <button id="btn-questions" class="btn-icon-only" title="Preguntas sugeridas" aria-label="Preguntas sugeridas" aria-expanded="false">💡</button>
+              <div class="status-pill" id="status-pill">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text" data-i18n="statusInit"></span>
+              </div>
+            </div>
+            <div class="header-right">
+              <button id="btn-voice-settings" class="btn-icon-only" title="Cambiar voz" aria-label="Cambiar voz">🗣️</button>
+              <button id="btn-install" class="btn-icon-only hidden" title="Instalar app" aria-label="Instalar app">📲</button>
+            </div>
+          </header>
+
+          <div id="voice-settings-panel" class="settings-panel hidden" aria-label="Configuración de voz">
+            <p class="questions-menu-title" data-i18n="voiceLabel"></p>
+            <div id="voice-mobile-info-mirror" class="voice-mobile-info hidden">
+              <p class="voice-mobile-title" data-i18n="voiceMobileTitle"></p>
+              <p class="voice-mobile-text" id="voice-mobile-guide-mirror"></p>
+            </div>
+            <label class="voice-filter">
+              <input type="checkbox" id="voice-female-only-mirror" checked />
+              <span data-i18n="voiceFemaleOnly"></span>
+            </label>
+            <label class="voice-filter voice-phone-filter-mirror">
+              <input type="checkbox" id="voice-phone-only-mirror" checked />
+              <span data-i18n="voicePhoneOnly"></span>
+            </label>
+            <p class="voice-hint" data-i18n="voiceSelectHint"></p>
+            <ul id="voice-list-mirror" class="voice-list" role="listbox" aria-label="Voces"></ul>
+          </div>
+
+          <nav id="questions-menu" class="questions-menu hidden" aria-label="Preguntas sugeridas">
+            <p class="questions-menu-title" data-i18n="questionsTitle"></p>
+            <ul id="questions-list" class="questions-list"></ul>
+          </nav>
+
+          <div class="marble-avatar" id="marble-avatar" aria-hidden="true">
+            <div class="avatar-ring speaking" id="avatar-ring">
+              <span>💬</span>
+            </div>
+          </div>
+
+          <div class="transcript-panel" id="transcript-panel">
+            <p class="transcript-label" data-i18n="assistantSays"></p>
+            <p class="transcript-text" id="assistant-text">—</p>
+            <p class="transcript-label user-label" data-i18n="youSay"></p>
+            <p class="transcript-text user-text" id="user-text">—</p>
+          </div>
+
+          <footer class="mirror-footer">
+            <p class="user-greeting" id="user-greeting"></p>
+            <div class="controls">
+              <button id="btn-mute" class="btn-control" title="Silenciar" aria-label="Silenciar">🔊</button>
+              <button id="btn-listen" class="btn-control btn-listen active" title="Escuchar" aria-label="Escuchar">
+                <span class="mic-pulse"></span>
+                🎤
+              </button>
+              <button id="btn-capture" class="btn-control" title="Analizar" aria-label="Analizar">📸</button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/phrase-pools.js"></script>
+  <script src="js/brain.js"></script>
+  <script src="js/image-analysis.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
