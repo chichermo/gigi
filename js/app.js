@@ -33,6 +33,9 @@
   const btnListen = $('#btn-listen');
   const btnCapture = $('#btn-capture');
   const btnInstall = $('#btn-install');
+  const btnInstallWelcome = $('#btn-install-welcome');
+  const installSection = $('#install-section');
+  const installHint = $('#install-hint');
   const btnQuestions = $('#btn-questions');
   const questionsMenu = $('#questions-menu');
   const questionsList = $('#questions-list');
@@ -84,16 +87,83 @@
     btnListen.addEventListener('click', toggleListen);
     btnCapture.addEventListener('click', captureAndAnalyze);
     btnInstall.addEventListener('click', installPWA);
+    btnInstallWelcome.addEventListener('click', installPWA);
     btnQuestions.addEventListener('click', toggleQuestionsMenu);
     buildQuestionsMenu();
+    setupInstallUI();
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstall = e;
-      btnInstall.classList.remove('hidden');
+      showInstallControls();
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstall = null;
+      hideInstallControls();
     });
 
     registerServiceWorker();
+  }
+
+  function isIOS() {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  function isAndroid() {
+    return /Android/i.test(navigator.userAgent);
+  }
+
+  function isMobileDevice() {
+    return isIOS() || isAndroid();
+  }
+
+  function isStandalone() {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+  }
+
+  function showInstallControls() {
+    installSection?.classList.remove('hidden');
+    btnInstall?.classList.remove('hidden');
+    btnInstallWelcome?.classList.remove('hidden');
+  }
+
+  function hideInstallControls() {
+    installSection?.classList.add('hidden');
+    btnInstall?.classList.add('hidden');
+    installHint?.classList.add('hidden');
+  }
+
+  function showInstallHint() {
+    if (!installHint) return;
+    if (isIOS()) {
+      installHint.textContent = I18n.t('installIosHint');
+    } else if (isAndroid()) {
+      installHint.textContent = I18n.t('installAndroidHint');
+    } else {
+      return;
+    }
+    installHint.classList.remove('hidden');
+    installHint.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function setupInstallUI() {
+    if (isStandalone()) {
+      hideInstallControls();
+      return;
+    }
+
+    if (!isMobileDevice()) {
+      installSection?.classList.add('hidden');
+      return;
+    }
+
+    showInstallControls();
+
+    if (isIOS() || (isAndroid() && !deferredInstall)) {
+      showInstallHint();
+    }
   }
 
   function onLanguageChange() {
@@ -103,6 +173,7 @@
     buildQuestionsMenu();
     updateStatus(lastStatus);
     if (userName) userGreeting.textContent = I18n.t('greetingUser', { name: userName });
+    if (installHint && !installHint.classList.contains('hidden')) showInstallHint();
   }
 
   function applyTranslations() {
@@ -433,11 +504,16 @@
   }
 
   async function installPWA() {
-    if (!deferredInstall) return;
-    deferredInstall.prompt();
-    await deferredInstall.userChoice;
-    deferredInstall = null;
-    btnInstall.classList.add('hidden');
+    if (deferredInstall) {
+      deferredInstall.prompt();
+      const { outcome } = await deferredInstall.userChoice;
+      if (outcome === 'accepted') {
+        deferredInstall = null;
+        hideInstallControls();
+      }
+      return;
+    }
+    showInstallHint();
   }
 
   document.addEventListener('DOMContentLoaded', init);

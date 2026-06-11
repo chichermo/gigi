@@ -8,6 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Marble" />
   <title>Marble — Tu Espejo Inteligente</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
@@ -51,6 +52,15 @@
           </label>
           <p class="voice-hint" data-i18n="voiceSelectHint"></p>
           <ul id="voice-list-welcome" class="voice-list" role="listbox" aria-label="Voces"></ul>
+        </div>
+
+        <div id="install-section" class="install-section">
+          <p id="install-ready" class="install-ready" data-i18n="installReady"></p>
+          <button type="button" id="btn-install-welcome" class="btn-install">
+            <span>📲</span>
+            <span data-i18n="installWelcomeBtn"></span>
+          </button>
+          <p id="install-hint" class="install-hint hidden"></p>
         </div>
 
         <button id="btn-start" class="btn-primary">
