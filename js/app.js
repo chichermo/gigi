@@ -281,7 +281,9 @@
       if (options.length === 0) {
         const li = document.createElement('li');
         li.className = 'voice-empty';
-        li.textContent = I18n.t('voiceLoading');
+        li.textContent = MarbleVoice.hasVoiceCatalog()
+          ? (I18n.t('voiceNoVoices') || I18n.t('voiceLoading'))
+          : I18n.t('voiceLoading');
         list.appendChild(li);
         return;
       }

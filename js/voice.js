@@ -38,14 +38,25 @@ const MarbleVoice = (() => {
   const PREFERRED_FEMALE = {
     es: ['helena', 'sabina', 'monica', 'paulina', 'laura', 'elvira', 'lucia'],
     en: ['zira', 'jenny', 'samantha', 'susan', 'aria', 'hazel', 'libby', 'sonia', 'nicky'],
-    nl: ['hanna', 'colette', 'fleur', 'claire', 'aylin', 'petra', 'lena'],
+    nl: ['hanna', 'colette', 'fleur', 'claire', 'ellen', 'marieke', 'lotte', 'nederlands', 'dutch'],
   };
 
   const MOBILE_PREFERRED_FEMALE = {
     es: ['google español', 'google spanish', 'sabina', 'paulina', 'monica', 'helena'],
     en: ['samantha', 'nicky', 'karen', 'google us english', 'google uk english'],
-    nl: ['google nederlands', 'google dutch', 'hanna', 'colette', 'claire', 'fleur'],
+    nl: ['google nederlands', 'google dutch', 'hanna', 'colette', 'claire', 'fleur', 'ellen'],
   };
+
+  const EXCLUDED_NON_DUTCH_HINTS = [
+    'india', 'indian', 'hindi', 'hungarian', 'magyar', 'veena', 'lekha', 'rishi',
+    'kanya', 'aditi', 'tamil', 'telugu', 'bengali', 'punjabi', 'gujarati',
+    'marathi', 'malayalam', 'kannada', 'arabic', 'hebrew', 'turkish', 'polish',
+    'czech', 'romanian', 'bulgarian', 'russian', 'ukrainian', 'greek', 'thai',
+    'vietnamese', 'indonesian', 'malay', 'chinese', 'mandarin', 'cantonese',
+    'japanese', 'korean', 'english', 'spanish', 'español', 'french', 'german',
+    'italian', 'portuguese', 'catalan', 'danish', 'finnish', 'norwegian',
+    'swedish', 'icelandic', 'persian', 'urdu', 'aylin', 'emel', 'sibel',
+  ];
 
   function isMobileDevice() {
     return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
@@ -79,6 +90,18 @@ const MarbleVoice = (() => {
   function matchesAppLang(voice) {
     const prefix = I18n.getVoicePrefix();
     return voice.lang.toLowerCase().replace('_', '-').startsWith(prefix);
+  }
+
+  function isNativeDutchVoice(voice) {
+    const lang = voice.lang.toLowerCase().replace('_', '-');
+    if (!lang.startsWith('nl')) return false;
+    const label = voiceLabel(voice);
+    return !EXCLUDED_NON_DUTCH_HINTS.some((hint) => label.includes(hint));
+  }
+
+  function isValidVoiceForApp(voice) {
+    if (I18n.getLang() === 'nl') return isNativeDutchVoice(voice);
+    return matchesAppLang(voice) || !femaleOnlyFilter;
   }
 
   function isDesktopOnlyVoice(voice) {
@@ -132,6 +155,7 @@ const MarbleVoice = (() => {
     }
     if (isFemaleVoice(voice)) score = Math.max(score, 50);
     if (matchesAppLang(voice)) score += 30;
+    if (I18n.getLang() === 'nl' && isNativeDutchVoice(voice)) score += 40;
     if (isMobileDevice() && voice.localService) score += 25;
     if (isPhoneUsableVoice(voice)) score += 15;
     return score;
@@ -144,6 +168,15 @@ const MarbleVoice = (() => {
   function getPickerPool() {
     const all = getAllVoices();
     let pool = all;
+
+    if (I18n.getLang() === 'nl') {
+      pool = pool.filter(isNativeDutchVoice);
+      if (phoneOnlyFilter) pool = pool.filter((v) => isPhoneUsableVoice(v));
+      if (femaleOnlyFilter) {
+        pool = pool.filter((v) => !isMaleVoice(v));
+      }
+      return pool;
+    }
 
     if (phoneOnlyFilter) {
       pool = pool.filter((v) => isPhoneUsableVoice(v));
@@ -214,7 +247,12 @@ const MarbleVoice = (() => {
 
     if (savedUri) {
       const saved = voices.find((v) => v.voiceURI === savedUri);
-      if (saved && (!femaleOnlyFilter || !isMaleVoice(saved)) && (!phoneOnlyFilter || isPhoneUsableVoice(saved))) {
+      if (
+        saved
+        && isValidVoiceForApp(saved)
+        && (!femaleOnlyFilter || !isMaleVoice(saved))
+        && (!phoneOnlyFilter || isPhoneUsableVoice(saved))
+      ) {
         selectedVoice = saved;
         return;
       }
@@ -290,6 +328,7 @@ const MarbleVoice = (() => {
   function setVoice(voiceURI) {
     const voice = getAllVoices().find((v) => v.voiceURI === voiceURI);
     if (!voice) return false;
+    if (!isValidVoiceForApp(voice)) return false;
     if (femaleOnlyFilter && isMaleVoice(voice)) return false;
     if (phoneOnlyFilter && !isPhoneUsableVoice(voice)) return false;
 
@@ -373,7 +412,7 @@ const MarbleVoice = (() => {
 
     const utterance = new SpeechSynthesisUtterance(text);
     const tone = getFriendlyTone();
-    utterance.lang = selectedVoice?.lang || I18n.getSpeechLang();
+    utterance.lang = I18n.getLang() === 'nl' ? I18n.getSpeechLang() : (selectedVoice?.lang || I18n.getSpeechLang());
     utterance.rate = tone.rate;
     utterance.pitch = tone.pitch;
     utterance.volume = 1;
@@ -437,10 +476,15 @@ const MarbleVoice = (() => {
     return null;
   }
 
+  function hasVoiceCatalog() {
+    return getAllVoices().length > 0;
+  }
+
   return {
     init,
     setLanguage,
     speak,
+    hasVoiceCatalog,
     listen,
     stopListening,
     stopSpeaking,
