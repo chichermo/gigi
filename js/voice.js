@@ -99,6 +99,10 @@ const MarbleVoice = (() => {
     return !EXCLUDED_NON_DUTCH_HINTS.some((hint) => label.includes(hint));
   }
 
+  function isNlNLVoice(voice) {
+    return voice.lang.toLowerCase().replace('_', '-').startsWith('nl-nl');
+  }
+
   function isValidVoiceForApp(voice) {
     if (I18n.getLang() === 'nl') return isNativeDutchVoice(voice);
     return matchesAppLang(voice) || !femaleOnlyFilter;
@@ -156,6 +160,7 @@ const MarbleVoice = (() => {
     if (isFemaleVoice(voice)) score = Math.max(score, 50);
     if (matchesAppLang(voice)) score += 30;
     if (I18n.getLang() === 'nl' && isNativeDutchVoice(voice)) score += 40;
+    if (I18n.getLang() === 'nl' && isNlNLVoice(voice)) score += 20;
     if (isMobileDevice() && voice.localService) score += 25;
     if (isPhoneUsableVoice(voice)) score += 15;
     return score;
@@ -235,10 +240,63 @@ const MarbleVoice = (() => {
 
   function getFriendlyTone() {
     const female = selectedVoice && (isFemaleVoice(selectedVoice) || !isMaleVoice(selectedVoice));
+    if (I18n.getLang() === 'nl') {
+      return {
+        rate: female ? 0.94 : 0.96,
+        pitch: female ? 1.04 : 1.06,
+      };
+    }
     return {
       rate: female ? 0.98 : 1.0,
       pitch: female ? 1.1 : 1.12,
     };
+  }
+
+  let speakQueueToken = 0;
+
+  function speakChunks(chunks, onDone, token) {
+    if (token !== speakQueueToken) return;
+
+    if (!chunks.length) {
+      isSpeaking = false;
+      notifyStatus('idle');
+      if (onDone) onDone();
+      return;
+    }
+
+    const [next, ...rest] = chunks;
+    const utterance = new SpeechSynthesisUtterance(next);
+    const tone = getFriendlyTone();
+    utterance.lang = I18n.getLang() === 'nl' ? I18n.getSpeechLang() : (selectedVoice?.lang || I18n.getSpeechLang());
+    utterance.rate = tone.rate;
+    utterance.pitch = tone.pitch;
+    utterance.volume = 1;
+    if (selectedVoice) utterance.voice = selectedVoice;
+
+    utterance.onstart = () => {
+      isSpeaking = true;
+      notifyStatus('speaking');
+    };
+
+    utterance.onend = () => {
+      if (token !== speakQueueToken) return;
+      if (rest.length) {
+        setTimeout(() => speakChunks(rest, onDone, token), 180);
+      } else {
+        isSpeaking = false;
+        notifyStatus('idle');
+        if (onDone) onDone();
+      }
+    };
+
+    utterance.onerror = () => {
+      if (token !== speakQueueToken) return;
+      isSpeaking = false;
+      notifyStatus('idle');
+      if (onDone) onDone();
+    };
+
+    synth.speak(utterance);
   }
 
   function loadSavedVoice() {
@@ -409,33 +467,16 @@ const MarbleVoice = (() => {
     }
 
     synth.cancel();
+    speakQueueToken += 1;
+    const token = speakQueueToken;
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const tone = getFriendlyTone();
-    utterance.lang = I18n.getLang() === 'nl' ? I18n.getSpeechLang() : (selectedVoice?.lang || I18n.getSpeechLang());
-    utterance.rate = tone.rate;
-    utterance.pitch = tone.pitch;
-    utterance.volume = 1;
-    if (selectedVoice) utterance.voice = selectedVoice;
+    const lang = I18n.getLang();
+    const prepared = typeof TtsPrep !== 'undefined' ? TtsPrep.prepare(lang, text) : text;
+    const chunks = (typeof TtsPrep !== 'undefined' && TtsPrep.shouldChunk(lang, prepared))
+      ? TtsPrep.chunkSentences(prepared)
+      : [prepared];
 
-    utterance.onstart = () => {
-      isSpeaking = true;
-      notifyStatus('speaking');
-    };
-
-    utterance.onend = () => {
-      isSpeaking = false;
-      notifyStatus('idle');
-      if (onDone) onDone();
-    };
-
-    utterance.onerror = () => {
-      isSpeaking = false;
-      notifyStatus('idle');
-      if (onDone) onDone();
-    };
-
-    synth.speak(utterance);
+    speakChunks(chunks, onDone, token);
   }
 
   function listen() {
@@ -455,6 +496,7 @@ const MarbleVoice = (() => {
   }
 
   function stopSpeaking() {
+    speakQueueToken += 1;
     synth.cancel();
     isSpeaking = false;
     notifyStatus('idle');

@@ -128,23 +128,40 @@ const MarbleBrain = (() => {
     return fn ? fn() : '';
   }
 
+  function isCompactLang() {
+    return I18n.getLang() === 'nl';
+  }
+
   function respond(intent, name, analysis = null) {
+    const compact = isCompactLang();
+
     switch (intent) {
       case 'look':
         return analysis
-          ? compose([
-              () => `${say('look', name)} ${colorComment(analysis, name)}`,
-              () => `${say('look', name)} ${say('compliments', name)}`,
-              () => colorComment(analysis, name),
-            ])
+          ? compose(compact
+            ? [
+                () => say('look', name),
+                () => `${say('look', name)} ${colorComment(analysis, name)}`,
+                () => colorComment(analysis, name),
+              ]
+            : [
+                () => `${say('look', name)} ${colorComment(analysis, name)}`,
+                () => `${say('look', name)} ${say('compliments', name)}`,
+                () => colorComment(analysis, name),
+              ])
           : say('look', name);
 
       case 'outfit':
         return analysis
-          ? compose([
-              () => `${say('outfit', name)} ${colorComment(analysis, name)}`,
-              () => `${say('outfit', name)} ${generalStyleComment(name)}`,
-            ])
+          ? compose(compact
+            ? [
+                () => say('outfit', name),
+                () => `${say('outfit', name)} ${colorComment(analysis, name)}`,
+              ]
+            : [
+                () => `${say('outfit', name)} ${colorComment(analysis, name)}`,
+                () => `${say('outfit', name)} ${generalStyleComment(name)}`,
+              ])
           : say('outfit', name);
 
       case 'compliment':
@@ -200,14 +217,22 @@ const MarbleBrain = (() => {
   function analyzeLook(name, analysis) {
     const useColor = analysis && analysis.confidence !== 'low';
     const colorPart = useColor ? colorComment(analysis, name) : generalStyleComment(name);
+    const compact = isCompactLang();
 
-    return compose([
-      () => `${say('look', name)} ${say('outfit', name)} ${colorPart}`,
-      () => `${say('outfit', name)} ${colorPart}`,
-      () => `${say('look', name)} ${colorPart}`,
-      () => `${colorPart} ${say('compliments', name)}`,
-      () => `${say('look', name)} ${say('compliments', name)}`,
-    ]);
+    return compose(compact
+      ? [
+          () => `${say('look', name)} ${colorPart}`,
+          () => `${say('outfit', name)} ${colorPart}`,
+          () => colorPart,
+          () => `${say('look', name)} ${say('compliments', name)}`,
+        ]
+      : [
+          () => `${say('look', name)} ${say('outfit', name)} ${colorPart}`,
+          () => `${say('outfit', name)} ${colorPart}`,
+          () => `${say('look', name)} ${colorPart}`,
+          () => `${colorPart} ${say('compliments', name)}`,
+          () => `${say('look', name)} ${say('compliments', name)}`,
+        ]);
   }
 
   function clearRecent() {
