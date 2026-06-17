@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marble-v14';
+const CACHE_NAME = 'marble-v15';
 
 function isCacheableRequest(request) {
   const url = new URL(request.url);

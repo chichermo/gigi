@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a12" />
-  <meta name="description" content="Tu espejo inteligente personal — opiniones, cumplidos y estilo por voz" />
+  <meta name="description" content="Jouw slimme spiegel — meningen, complimenten en stijl via spraak" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Marble" />
-  <title>Marble — Tu Espejo Inteligente</title>
+  <title>Marble — Jouw Slimme Spiegel</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -31,13 +31,22 @@
           <p class="subtitle" data-i18n="subtitle"></p>
         </header>
 
+        <div id="install-section" class="install-section install-section--top">
+          <p id="install-ready" class="install-ready" data-i18n="installReady"></p>
+          <button type="button" id="btn-install-welcome" class="btn-install">
+            <span aria-hidden="true">📲</span>
+            <span data-i18n="installWelcomeBtn"></span>
+          </button>
+          <p id="install-hint" class="install-hint"></p>
+        </div>
+
         <div class="settings-card">
           <div class="lang-picker">
             <label for="lang-select" class="field-label" data-i18n="languageLabel"></label>
-            <select id="lang-select" class="field-select" aria-label="Language">
+            <select id="lang-select" class="field-select" aria-label="Taal">
+              <option value="nl">Nederlands</option>
               <option value="es">Español</option>
               <option value="en">English</option>
-              <option value="nl">Nederlands</option>
             </select>
           </div>
 
@@ -59,15 +68,6 @@
             <p class="voice-hint" data-i18n="voiceSelectHint"></p>
             <ul id="voice-list-welcome" class="voice-list" role="listbox" aria-label="Voces"></ul>
           </div>
-        </div>
-
-        <div id="install-section" class="install-section">
-          <p id="install-ready" class="install-ready" data-i18n="installReady"></p>
-          <button type="button" id="btn-install-welcome" class="btn-install">
-            <span aria-hidden="true">📲</span>
-            <span data-i18n="installWelcomeBtn"></span>
-          </button>
-          <p id="install-hint" class="install-hint hidden"></p>
         </div>
 
         <div class="welcome-actions">
@@ -99,7 +99,7 @@
             <div class="header-right">
               <span class="mirror-brand" aria-hidden="true">Marble</span>
               <button id="btn-voice-settings" class="btn-icon-only" title="Cambiar voz" aria-label="Cambiar voz">🗣️</button>
-              <button id="btn-install" class="btn-icon-only hidden" title="Instalar app" aria-label="Instalar app">📲</button>
+              <button id="btn-install" class="btn-icon-only" title="App installeren" aria-label="App installeren">📲</button>
             </div>
           </header>
 

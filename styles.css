@@ -260,9 +260,23 @@ h1 {
 .install-section {
   padding: 0.9rem 1rem;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(192, 132, 252, 0.12), rgba(249, 168, 212, 0.08));
-  border: 1px solid rgba(192, 132, 252, 0.25);
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.14), rgba(249, 168, 212, 0.1));
+  border: 1px solid rgba(192, 132, 252, 0.32);
   text-align: center;
+}
+
+.install-section--top {
+  margin-bottom: 0.15rem;
+}
+
+body.is-mobile .install-section--top {
+  box-shadow: 0 4px 24px rgba(192, 132, 252, 0.15);
+}
+
+body.is-mobile .btn-install {
+  max-width: none;
+  font-size: 1rem;
+  padding: 0.85rem 1.35rem;
 }
 
 .install-section.hidden {
@@ -315,6 +329,10 @@ h1 {
   border-radius: var(--radius-sm);
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.install-hint.hidden {
+  display: none;
 }
 
 .voice-picker {
@@ -516,7 +534,7 @@ h1 {
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  min-height: 0;
   padding: calc(0.65rem + var(--safe-top)) max(0.85rem, env(safe-area-inset-left, 0px)) calc(0.65rem + var(--safe-bottom)) max(0.85rem, env(safe-area-inset-right, 0px));
   background: linear-gradient(
     to bottom,
@@ -528,6 +546,7 @@ h1 {
     rgba(0, 0, 0, 0.82) 100%
   );
   pointer-events: none;
+  overflow: hidden;
 }
 
 .mirror-overlay > * {
@@ -549,6 +568,7 @@ h1 {
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  min-height: 42px;
 }
 
 .header-left {
@@ -595,10 +615,8 @@ h1 {
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
   animation: menu-in 0.22s ease-out;
-}
-
-.questions-menu {
-  max-height: 40vh;
+  flex-shrink: 0;
+  max-height: min(38vh, 300px);
   overflow-y: auto;
 }
 
@@ -709,6 +727,9 @@ h1 {
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-icon-only:hover {
@@ -754,7 +775,8 @@ h1 {
 }
 
 .transcript-panel {
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-height: 0;
   padding: 0.9rem 1rem;
   border-radius: var(--radius-lg);
   background: var(--glass);
@@ -762,11 +784,12 @@ h1 {
   -webkit-backdrop-filter: blur(22px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
-  max-height: 32vh;
+  max-height: min(32vh, 220px);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .transcript-block {
@@ -833,7 +856,7 @@ h1 {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
-  width: fit-content;
+  width: min(100%, 320px);
   margin: 0 auto;
 }
 
@@ -903,6 +926,12 @@ h1 {
 }
 
 /* ── Responsive ── */
+@media (max-width: 768px) {
+  body.is-mobile #btn-install {
+    display: inline-flex;
+  }
+}
+
 @media (max-width: 480px) {
   h1 { font-size: 2.1rem; }
   .tagline { font-size: 0.98rem; }
@@ -912,7 +941,7 @@ h1 {
   .settings-card { padding: 0.9rem; border-radius: var(--radius); }
   .voice-list { max-height: 130px; }
   #camera { object-position: center 22%; }
-  .transcript-panel { max-height: 28vh; padding: 0.8rem 0.9rem; border-radius: var(--radius); }
+  .transcript-panel { max-height: min(28vh, 180px); padding: 0.8rem 0.9rem; border-radius: var(--radius); }
   .transcript-text { font-size: 0.86rem; }
   .questions-menu { max-height: 32vh; }
   .question-item { font-size: 0.8rem; padding: 0.55rem 0.65rem; }
@@ -935,12 +964,14 @@ h1 {
     right: max(0.75rem, env(safe-area-inset-right, 0px));
   }
   .avatar-ring { width: 42px; height: 42px; font-size: 1.1rem; }
-  .control-dock { gap: 0.85rem; padding: 0.55rem 1rem; }
+  .control-dock { gap: 0.85rem; padding: 0.55rem 0.85rem; width: 100%; }
+  .mirror-footer { padding-bottom: 0.15rem; }
 }
 
 @media (max-width: 380px) {
   h1 { font-size: 1.9rem; }
-  .transcript-panel { max-height: 24vh; }
+  .welcome-content { gap: 0.75rem; }
+  .transcript-panel { max-height: min(24vh, 150px); }
   .btn-control.btn-side { width: 44px; height: 44px; }
   .btn-control.btn-listen { width: 54px; height: 54px; }
   .status-pill { max-width: calc(100vw - 7.5rem); }
@@ -954,10 +985,15 @@ h1 {
 
 @media (max-height: 700px) and (max-width: 480px) {
   .welcome-hero { padding-top: 0; }
-  .logo-ring { width: 60px; height: 60px; }
+  .welcome-hero .subtitle { margin-top: 0.5rem; }
+  .logo-ring { width: 60px; height: 60px; margin-bottom: 0.75rem; }
   h1 { font-size: 1.75rem; }
-  .voice-list { max-height: 100px; }
-  .transcript-panel { max-height: 22vh; }
+  .voice-list { max-height: 90px; }
+  .install-section { padding: 0.75rem; }
+  .install-hint { font-size: 0.72rem; padding: 0.5rem 0.6rem; }
+  .transcript-panel { max-height: min(22vh, 140px); }
+  .settings-panel,
+  .questions-menu { max-height: min(30vh, 200px); }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
@@ -981,6 +1017,10 @@ h1 {
 }
 
 @media (min-width: 481px) {
+  #btn-install {
+    display: none;
+  }
+
   .mirror-container {
     max-width: 480px;
     margin: 0 auto;

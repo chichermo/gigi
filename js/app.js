@@ -91,11 +91,14 @@
     btnQuestions.addEventListener('click', toggleQuestionsMenu);
     buildQuestionsMenu();
     setupInstallUI();
+    updateMobileClass();
+    window.addEventListener('resize', updateMobileClass, { passive: true });
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstall = e;
       showInstallControls();
+      showInstallHint();
     });
 
     window.addEventListener('appinstalled', () => {
@@ -118,12 +121,25 @@
     return isIOS() || isAndroid();
   }
 
+  function isMobileViewport() {
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  function shouldOfferInstall() {
+    return !isStandalone() && (isMobileDevice() || isMobileViewport());
+  }
+
+  function updateMobileClass() {
+    document.body.classList.toggle('is-mobile', shouldOfferInstall());
+  }
+
   function isStandalone() {
     return window.matchMedia('(display-mode: standalone)').matches
       || window.navigator.standalone === true;
   }
 
   function showInstallControls() {
+    if (!shouldOfferInstall()) return;
     installSection?.classList.remove('hidden');
     btnInstall?.classList.remove('hidden');
     btnInstallWelcome?.classList.remove('hidden');
@@ -132,38 +148,45 @@
   function hideInstallControls() {
     installSection?.classList.add('hidden');
     btnInstall?.classList.add('hidden');
-    installHint?.classList.add('hidden');
+    if (installHint) installHint.classList.add('hidden');
   }
 
-  function showInstallHint() {
-    if (!installHint) return;
+  function showInstallHint(force = false) {
+    if (!installHint || !shouldOfferInstall()) return;
     if (isIOS()) {
       installHint.textContent = I18n.t('installIosHint');
     } else if (isAndroid()) {
-      installHint.textContent = I18n.t('installAndroidHint');
+      installHint.textContent = deferredInstall
+        ? I18n.t('installAndroidReady')
+        : I18n.t('installAndroidHint');
+    } else if (isMobileViewport()) {
+      installHint.textContent = I18n.t('installMobileHint');
     } else {
       return;
     }
     installHint.classList.remove('hidden');
-    installHint.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (force) {
+      installSection?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   function setupInstallUI() {
+    updateMobileClass();
+
     if (isStandalone()) {
       hideInstallControls();
       return;
     }
 
-    if (!isMobileDevice()) {
+    if (!shouldOfferInstall()) {
       installSection?.classList.add('hidden');
+      btnInstall?.classList.add('hidden');
+      installHint?.classList.add('hidden');
       return;
     }
 
     showInstallControls();
-
-    if (isIOS() || (isAndroid() && !deferredInstall)) {
-      showInstallHint();
-    }
+    showInstallHint(true);
   }
 
   function onLanguageChange() {
@@ -173,7 +196,10 @@
     buildQuestionsMenu();
     updateStatus(lastStatus);
     if (userName) userGreeting.textContent = I18n.t('greetingUser', { name: userName });
-    if (installHint && !installHint.classList.contains('hidden')) showInstallHint();
+    if (shouldOfferInstall() && installHint && !installSection?.classList.contains('hidden')) {
+      showInstallHint();
+    }
+    updateMobileClass();
   }
 
   function applyTranslations() {
@@ -515,7 +541,7 @@
       }
       return;
     }
-    showInstallHint();
+    showInstallHint(true);
   }
 
   document.addEventListener('DOMContentLoaded', init);
