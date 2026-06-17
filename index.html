@@ -75,6 +75,7 @@
             <span class="btn-icon" aria-hidden="true">🎙️</span>
             <span id="btn-start-label" data-i18n="btnStart"></span>
           </button>
+          <p id="wake-hint" class="wake-hint"></p>
           <p class="hint" data-i18n="hint"></p>
         </div>
       </div>
@@ -121,8 +122,9 @@
             <ul id="voice-list-mirror" class="voice-list" role="listbox" aria-label="Voces"></ul>
           </div>
 
-          <nav id="questions-menu" class="questions-menu hidden" aria-label="Preguntas sugeridas">
+          <nav id="questions-menu" class="questions-menu hidden" aria-label="Vragen">
             <p class="panel-title" data-i18n="questionsTitle"></p>
+            <p class="questions-menu-sub" data-i18n="questionsMenuSub"></p>
             <ul id="questions-list" class="questions-list"></ul>
           </nav>
 
@@ -162,8 +164,10 @@
   </div>
 
   <script src="js/i18n.js"></script>
+  <script src="js/wake-word.js"></script>
   <script src="js/nl-phrases.js"></script>
   <script src="js/phrase-pools.js"></script>
+  <script src="js/questions-menu.js"></script>
   <script src="js/tts-prep.js"></script>
   <script src="js/brain.js"></script>
   <script src="js/image-analysis.js"></script>

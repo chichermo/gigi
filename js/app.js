@@ -29,6 +29,7 @@
   const appTitle = $('#app-title');
   const btnStart = $('#btn-start');
   const btnStartLabel = $('#btn-start-label');
+  const wakeHint = $('#wake-hint');
   const btnMute = $('#btn-mute');
   const btnListen = $('#btn-listen');
   const btnCapture = $('#btn-capture');
@@ -92,6 +93,7 @@
     buildQuestionsMenu();
     setupInstallUI();
     updateMobileClass();
+    startWakeMode();
     window.addEventListener('resize', updateMobileClass, { passive: true });
 
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -200,6 +202,24 @@
       showInstallHint();
     }
     updateMobileClass();
+    if (screenWelcome.classList.contains('active')) startWakeMode();
+  }
+
+  function updateWakeHint() {
+    if (!wakeHint) return;
+    const phrase = typeof WakeWord !== 'undefined' ? WakeWord.getPhrases() : 'Hoi Marble';
+    wakeHint.textContent = I18n.t('wakeHint', { phrase });
+  }
+
+  function startWakeMode() {
+    if (!screenWelcome.classList.contains('active') || !MarbleVoice.isSupported()) return;
+    updateWakeHint();
+    MarbleVoice.startWakeListening(onWakeTriggered);
+  }
+
+  function onWakeTriggered() {
+    if (!screenWelcome.classList.contains('active')) return;
+    MarbleVoice.speak(I18n.t('wakeGreeting'), () => startApp());
   }
 
   function applyTranslations() {
@@ -240,6 +260,7 @@
     btnMute.setAttribute('aria-label', btnMute.title);
 
     statusText.textContent = I18n.t('statusInit');
+    updateWakeHint();
   }
 
   async function registerServiceWorker() {
@@ -251,6 +272,7 @@
   }
 
   async function startApp() {
+    MarbleVoice.stopWakeListening();
     btnStart.disabled = true;
 
     try {
@@ -402,15 +424,31 @@
 
   function buildQuestionsMenu() {
     questionsList.innerHTML = '';
-    MarbleBrain.getSuggestedQuestions().forEach((item) => {
-      const li = document.createElement('li');
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'question-item';
-      btn.innerHTML = `<span class="q-icon">${item.icon}</span><span>${item.text}</span>`;
-      btn.addEventListener('click', () => askSuggestedQuestion(item));
-      li.appendChild(btn);
-      questionsList.appendChild(li);
+    MarbleBrain.getQuestionCategories().forEach((category) => {
+      const section = document.createElement('li');
+      section.className = 'question-category';
+
+      const head = document.createElement('div');
+      head.className = 'question-category-head';
+      head.innerHTML = `<span class="q-cat-icon">${category.icon}</span><span class="q-cat-title">${category.title}</span>`;
+      section.appendChild(head);
+
+      const grid = document.createElement('ul');
+      grid.className = 'question-grid';
+
+      category.items.forEach((item) => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'question-item';
+        btn.innerHTML = `<span class="q-icon">${item.icon}</span><span class="q-text">${item.text}</span>`;
+        btn.addEventListener('click', () => askSuggestedQuestion(item));
+        li.appendChild(btn);
+        grid.appendChild(li);
+      });
+
+      section.appendChild(grid);
+      questionsList.appendChild(section);
     });
   }
 
@@ -443,12 +481,26 @@
 
     userText.textContent = item.text;
 
-    if (item.action === 'analyze') {
+    if (item.action === 'analyze' || item.intent === 'analyze') {
       captureAndAnalyze();
       return;
     }
 
-    processUserInput(item.text);
+    const intent = item.intent || MarbleBrain.detectIntent(item.text);
+    const name = userName || I18n.t('fallbackName');
+
+    if (intent === 'analyze') {
+      captureAndAnalyze();
+      return;
+    }
+
+    if (['look', 'outfit', 'hair', 'makeup', 'colors', 'date', 'style_vibe'].includes(intent) && !lastAnalysis) {
+      captureAndAnalyze(true);
+    }
+
+    const response = MarbleBrain.respond(intent, name, lastAnalysis);
+    showAssistantText(response);
+    MarbleVoice.speak(response, () => scheduleListen());
   }
 
   function processUserInput(text) {
@@ -473,6 +525,12 @@
     }
 
     const intent = MarbleBrain.detectIntent(text);
+
+    if (appState === STATE.READY && ['look', 'outfit', 'hair', 'makeup', 'colors', 'date', 'style_vibe'].includes(intent)) {
+      if (camera.videoWidth) {
+        lastAnalysis = ImageAnalysis.analyzeFrame(camera, snapshot);
+      }
+    }
 
     if (intent === 'analyze') {
       captureAndAnalyze();
@@ -507,6 +565,7 @@
       speaking: I18n.t('statusSpeaking'),
       idle: listenEnabled ? I18n.t('statusIdle') : I18n.t('statusMicPaused'),
       error: I18n.t('statusError'),
+      wake: I18n.t('statusWakeListening', { phrase: typeof WakeWord !== 'undefined' ? WakeWord.getPhrases() : 'Hoi Marble' }),
     };
     statusText.textContent = labels[status] || I18n.t('statusIdle');
     avatarRing.classList.toggle('speaking', status === 'speaking');

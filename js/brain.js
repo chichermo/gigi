@@ -83,6 +83,44 @@ const MarbleBrain = (() => {
     return line.replace('{color}', color);
   }
 
+  function hairComment(analysis, name) {
+    const b = brain();
+    const hair = analysis?.hair;
+
+    if (!hair || hair.sampled < 25 || hair.tone === 'unknown') {
+      return fill(b.hairNoView || b.colorsNoView, name);
+    }
+
+    if (hair.confidence === 'low') {
+      return say('hair', name);
+    }
+
+    const comments = [
+      ...(b.hairComments?.[hair.tone] || []),
+      ...(b.hairComments?.default || []),
+    ];
+    return fill(pickUnique(comments, `hair:${hair.tone}`), name);
+  }
+
+  function makeupComment(analysis, name) {
+    const b = brain();
+    const makeup = analysis?.makeup;
+
+    if (!makeup || makeup.sampled < 30 || makeup.level === 'unknown') {
+      return fill(b.makeupNoView || b.colorsNoView, name);
+    }
+
+    if (makeup.confidence === 'low') {
+      return say('makeup', name);
+    }
+
+    const comments = [
+      ...(b.makeupComments?.[makeup.level] || []),
+      ...(b.makeupComments?.default || []),
+    ];
+    return fill(pickUnique(comments, `makeup:${makeup.level}`), name);
+  }
+
   function colorComment(analysis, name) {
     const b = brain();
 
@@ -164,6 +202,32 @@ const MarbleBrain = (() => {
               ])
           : say('outfit', name);
 
+      case 'hair':
+        return analysis
+          ? compose(compact
+            ? [
+                () => hairComment(analysis, name),
+                () => `${say('hair', name)} ${hairComment(analysis, name)}`,
+              ]
+            : [
+                () => `${say('hair', name)} ${hairComment(analysis, name)}`,
+                () => hairComment(analysis, name),
+              ])
+          : say('hair', name);
+
+      case 'makeup':
+        return analysis
+          ? compose(compact
+            ? [
+                () => makeupComment(analysis, name),
+                () => `${say('makeup', name)} ${makeupComment(analysis, name)}`,
+              ]
+            : [
+                () => `${say('makeup', name)} ${makeupComment(analysis, name)}`,
+                () => makeupComment(analysis, name),
+              ])
+          : say('makeup', name);
+
       case 'compliment':
         return say('compliments', name);
 
@@ -221,18 +285,24 @@ const MarbleBrain = (() => {
 
     return compose(compact
       ? [
+          () => `${say('look', name)} ${hairComment(analysis, name)}`,
+          () => `${say('outfit', name)} ${makeupComment(analysis, name)}`,
           () => `${say('look', name)} ${colorPart}`,
-          () => `${say('outfit', name)} ${colorPart}`,
-          () => colorPart,
+          () => `${hairComment(analysis, name)} ${makeupComment(analysis, name)}`,
           () => `${say('look', name)} ${say('compliments', name)}`,
         ]
       : [
-          () => `${say('look', name)} ${say('outfit', name)} ${colorPart}`,
-          () => `${say('outfit', name)} ${colorPart}`,
+          () => `${say('look', name)} ${say('outfit', name)} ${hairComment(analysis, name)} ${makeupComment(analysis, name)}`,
+          () => `${say('outfit', name)} ${colorPart} ${hairComment(analysis, name)}`,
           () => `${say('look', name)} ${colorPart}`,
           () => `${colorPart} ${say('compliments', name)}`,
           () => `${say('look', name)} ${say('compliments', name)}`,
         ]);
+  }
+
+  function getQuestionCategories() {
+    const lang = I18n.getLang();
+    return QuestionMenu[lang] || QuestionMenu.nl;
   }
 
   function clearRecent() {
@@ -242,7 +312,8 @@ const MarbleBrain = (() => {
   return {
     getGreeting: () => pickUnique(brain().greetings, 'greetings'),
     getNameConfirm: (name) => fill(pickUnique(brain().nameConfirm, 'nameConfirm'), name),
-    getSuggestedQuestions: () => brain().questions,
+    getSuggestedQuestions: () => getQuestionCategories().flatMap((c) => c.items),
+    getQuestionCategories,
     detectIntent,
     extractName,
     respond,

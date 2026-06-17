@@ -7,6 +7,9 @@ const MarbleVoice = (() => {
   const PHONE_ONLY_KEY = 'marble-voice-phone-only';
 
   let recognition = null;
+  let wakeRecognition = null;
+  let wakeActive = false;
+  let onWake = null;
   let synth = window.speechSynthesis;
   let selectedVoice = null;
   let isListening = false;
@@ -331,6 +334,7 @@ const MarbleVoice = (() => {
     initPhoneFilterDefault();
     loadSavedVoice();
     setupRecognition();
+    setupWakeRecognition();
 
     const refreshVoices = () => {
       loadSavedVoice();
@@ -348,6 +352,7 @@ const MarbleVoice = (() => {
 
   function setLanguage() {
     updateRecognitionLang();
+    if (wakeRecognition) wakeRecognition.lang = I18n.getSpeechLang();
     loadSavedVoice();
     notifyVoicesReady();
   }
@@ -412,6 +417,70 @@ const MarbleVoice = (() => {
     speak(text || I18n.t('voicePreview'), () => {
       selectedVoice = prev;
     });
+  }
+
+  function setupWakeRecognition() {
+    if (!SpeechRecognition) return;
+
+    wakeRecognition = new SpeechRecognition();
+    wakeRecognition.lang = I18n.getSpeechLang();
+    wakeRecognition.continuous = true;
+    wakeRecognition.interimResults = true;
+    wakeRecognition.maxAlternatives = 1;
+
+    wakeRecognition.onresult = (event) => {
+      let chunk = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        chunk += event.results[i][0].transcript;
+      }
+      if (typeof WakeWord !== 'undefined' && WakeWord.matches(chunk)) {
+        stopWakeListening();
+        if (onWake) onWake();
+      }
+    };
+
+    wakeRecognition.onend = () => {
+      if (wakeActive && !isSpeaking) {
+        setTimeout(() => {
+          if (!wakeActive) return;
+          try { wakeRecognition.start(); } catch { /* noop */ }
+        }, 350);
+      }
+    };
+
+    wakeRecognition.onerror = (event) => {
+      if (event.error === 'aborted' || event.error === 'no-speech') return;
+      if (wakeActive) {
+        setTimeout(() => {
+          if (!wakeActive) return;
+          try { wakeRecognition.start(); } catch { /* noop */ }
+        }, 800);
+      }
+    };
+  }
+
+  function startWakeListening(callback) {
+    if (!wakeRecognition || wakeActive || isSpeaking) return false;
+    onWake = callback;
+    wakeActive = true;
+    notifyStatus('wake');
+    try {
+      wakeRecognition.lang = I18n.getSpeechLang();
+      wakeRecognition.start();
+      return true;
+    } catch {
+      wakeActive = false;
+      notifyStatus('idle');
+      return false;
+    }
+  }
+
+  function stopWakeListening() {
+    wakeActive = false;
+    onWake = null;
+    if (wakeRecognition) {
+      try { wakeRecognition.stop(); } catch { /* noop */ }
+    }
   }
 
   function setupRecognition() {
@@ -529,6 +598,8 @@ const MarbleVoice = (() => {
     hasVoiceCatalog,
     listen,
     stopListening,
+    startWakeListening,
+    stopWakeListening,
     stopSpeaking,
     setMuted,
     setVoice,
@@ -544,6 +615,7 @@ const MarbleVoice = (() => {
     isSupported,
     getSupportMessage,
     get isListening() { return isListening; },
+    get isWakeListening() { return wakeActive; },
     get isSpeaking() { return isSpeaking; },
     set onResult(fn) { onResult = fn; },
     set onStatusChange(fn) { onStatusChange = fn; },

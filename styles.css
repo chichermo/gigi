@@ -257,6 +257,14 @@ h1 {
   line-height: 1.45;
 }
 
+.wake-hint {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent-warm);
+  line-height: 1.45;
+}
+
 .install-section {
   padding: 0.9rem 1rem;
   border-radius: var(--radius);
@@ -616,8 +624,15 @@ body.is-mobile .btn-install {
   box-shadow: var(--shadow-soft);
   animation: menu-in 0.22s ease-out;
   flex-shrink: 0;
-  max-height: min(38vh, 300px);
+  max-height: min(52vh, 420px);
   overflow-y: auto;
+}
+
+.questions-menu-sub {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin: -0.35rem 0 0.65rem;
+  line-height: 1.4;
 }
 
 .settings-panel .voice-list {
@@ -633,25 +648,64 @@ body.is-mobile .btn-install {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.38rem;
+  gap: 0.75rem;
+}
+
+.question-category {
+  list-style: none;
+}
+
+.question-category-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.45rem;
+  padding: 0 0.1rem;
+}
+
+.q-cat-icon {
+  font-size: 1rem;
+}
+
+.q-cat-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.question-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
 }
 
 .question-item {
   width: 100%;
+  min-height: 100%;
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.62rem 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  padding: 0.62rem 0.68rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   font-family: inherit;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   font-weight: 500;
+  line-height: 1.35;
   text-align: left;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.question-item .q-text {
+  flex: 1;
 }
 
 .question-item:hover,
@@ -707,6 +761,7 @@ body.is-mobile .btn-install {
 
 .status-dot.listening { background: var(--success); animation: pulse-dot 1.2s infinite; }
 .status-dot.speaking { background: var(--accent); animation: pulse-dot 0.8s infinite; }
+.status-dot.wake { background: var(--accent-warm); animation: pulse-dot 1.4s infinite; }
 .status-dot.idle { background: var(--text-faint); }
 .status-dot.error { background: var(--danger); }
 
@@ -943,8 +998,9 @@ body.is-mobile .btn-install {
   #camera { object-position: center 22%; }
   .transcript-panel { max-height: min(28vh, 180px); padding: 0.8rem 0.9rem; border-radius: var(--radius); }
   .transcript-text { font-size: 0.86rem; }
-  .questions-menu { max-height: 32vh; }
-  .question-item { font-size: 0.8rem; padding: 0.55rem 0.65rem; }
+  .questions-menu { max-height: min(48vh, 380px); }
+  .question-grid { grid-template-columns: 1fr; }
+  .question-item { font-size: 0.8rem; flex-direction: row; align-items: center; gap: 0.55rem; }
   .btn-control.btn-side { width: 46px; height: 46px; font-size: 1.1rem; }
   .btn-control.btn-listen { width: 58px; height: 58px; font-size: 1.4rem; }
   .btn-icon-only { width: 40px; height: 40px; }

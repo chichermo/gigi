@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marble-v15';
+const CACHE_NAME = 'marble-v16';
 
 function isCacheableRequest(request) {
   const url = new URL(request.url);
@@ -12,8 +12,10 @@ const ASSETS = [
   './js/app.js',
   './js/voice.js',
   './js/i18n.js',
+  './js/wake-word.js',
   './js/nl-phrases.js',
   './js/phrase-pools.js',
+  './js/questions-menu.js',
   './js/tts-prep.js',
   './js/brain.js',
   './js/image-analysis.js',
