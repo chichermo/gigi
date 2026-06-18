@@ -1,5 +1,5 @@
 /**
- * Motor conversacional de Marble (multilingüe + anti-repetición).
+ * Motor conversacional de Mirror (multilingüe + anti-repetición).
  */
 const MarbleBrain = (() => {
   const MIN_SECONDARY_SHARE = 0.18;

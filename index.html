@@ -8,8 +8,8 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Marble" />
-  <title>Marble — Jouw Slimme Spiegel</title>
+  <meta name="apple-mobile-web-app-title" content="Mirror" />
+  <title>Mirror — Jouw Slimme Spiegel</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -26,7 +26,7 @@
           <div class="logo-ring">
             <span class="logo-icon" aria-hidden="true">✨</span>
           </div>
-          <h1 id="app-title">Marble</h1>
+          <h1 id="app-title">Mirror</h1>
           <p class="tagline" data-i18n="tagline"></p>
           <p class="subtitle" data-i18n="subtitle"></p>
         </header>
@@ -41,12 +41,10 @@
         </div>
 
         <div class="settings-card">
-          <div class="lang-picker">
+          <div class="lang-picker hidden" aria-hidden="true">
             <label for="lang-select" class="field-label" data-i18n="languageLabel"></label>
             <select id="lang-select" class="field-select" aria-label="Taal">
-              <option value="nl">Nederlands</option>
-              <option value="es">Español</option>
-              <option value="en">English</option>
+              <option value="nl" selected>Nederlands</option>
             </select>
           </div>
 
@@ -66,7 +64,8 @@
               <span data-i18n="voicePhoneOnly"></span>
             </label>
             <p class="voice-hint" data-i18n="voiceSelectHint"></p>
-            <ul id="voice-list-welcome" class="voice-list" role="listbox" aria-label="Voces"></ul>
+            <p id="voice-count" class="voice-count" aria-live="polite"></p>
+            <ul id="voice-list-welcome" class="voice-list" role="listbox" aria-label="Stemmen"></ul>
           </div>
         </div>
 
@@ -98,7 +97,7 @@
               </div>
             </div>
             <div class="header-right">
-              <span class="mirror-brand" aria-hidden="true">Marble</span>
+              <span class="mirror-brand" aria-hidden="true">Mirror</span>
               <button id="btn-voice-settings" class="btn-icon-only" title="Cambiar voz" aria-label="Cambiar voz">🗣️</button>
               <button id="btn-install" class="btn-icon-only" title="App installeren" aria-label="App installeren">📲</button>
             </div>
@@ -119,7 +118,8 @@
               <span data-i18n="voicePhoneOnly"></span>
             </label>
             <p class="voice-hint" data-i18n="voiceSelectHint"></p>
-            <ul id="voice-list-mirror" class="voice-list" role="listbox" aria-label="Voces"></ul>
+            <p id="voice-count-mirror" class="voice-count" aria-live="polite"></p>
+            <ul id="voice-list-mirror" class="voice-list" role="listbox" aria-label="Stemmen"></ul>
           </div>
 
           <nav id="questions-menu" class="questions-menu hidden" aria-label="Vragen">

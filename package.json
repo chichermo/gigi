@@ -1,7 +1,7 @@
 {
-  "name": "marble",
-  "version": "2.0.0",
-  "description": "Marble — smart mirror PWA with voice (es/en/nl)",
+  "name": "mirror",
+  "version": "2.1.0",
+  "description": "Mirror — smart mirror PWA with voice (es/en/nl)",
   "scripts": {
     "start": "npx --yes serve . -p 3000",
     "icons": "node scripts/generate-icons.js"

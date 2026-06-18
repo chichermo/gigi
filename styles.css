@@ -366,8 +366,15 @@ body.is-mobile .btn-install {
 .voice-hint {
   font-size: 0.74rem;
   color: var(--text-faint);
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.35rem;
   line-height: 1.45;
+}
+
+.voice-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-warm);
+  margin: 0 0 0.5rem;
 }
 
 .voice-mobile-info {
@@ -404,7 +411,7 @@ body.is-mobile .btn-install {
 
 .voice-list {
   list-style: none;
-  max-height: 180px;
+  max-height: 280px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -456,6 +463,11 @@ body.is-mobile .btn-install {
   border-color: var(--accent);
   background: rgba(192, 132, 252, 0.2);
   box-shadow: 0 0 16px rgba(192, 132, 252, 0.2);
+}
+
+.voice-option--natural {
+  border-color: rgba(249, 168, 212, 0.35);
+  background: rgba(249, 168, 212, 0.06);
 }
 
 .voice-option-main {
@@ -636,7 +648,7 @@ body.is-mobile .btn-install {
 }
 
 .settings-panel .voice-list {
-  max-height: 150px;
+  max-height: 200px;
 }
 
 @keyframes menu-in {
@@ -994,7 +1006,7 @@ body.is-mobile .btn-install {
   .logo-ring { width: 72px; height: 72px; margin-bottom: 1rem; }
   .logo-icon { font-size: 2rem; }
   .settings-card { padding: 0.9rem; border-radius: var(--radius); }
-  .voice-list { max-height: 130px; }
+  .voice-list { max-height: 180px; }
   #camera { object-position: center 22%; }
   .transcript-panel { max-height: min(28vh, 180px); padding: 0.8rem 0.9rem; border-radius: var(--radius); }
   .transcript-text { font-size: 0.86rem; }
@@ -1044,7 +1056,7 @@ body.is-mobile .btn-install {
   .welcome-hero .subtitle { margin-top: 0.5rem; }
   .logo-ring { width: 60px; height: 60px; margin-bottom: 0.75rem; }
   h1 { font-size: 1.75rem; }
-  .voice-list { max-height: 90px; }
+  .voice-list { max-height: 150px; }
   .install-section { padding: 0.75rem; }
   .install-hint { font-size: 0.72rem; padding: 0.5rem 0.6rem; }
   .transcript-panel { max-height: min(22vh, 140px); }

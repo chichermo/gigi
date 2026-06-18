@@ -1,39 +1,29 @@
-# Marble — Smart Mirror
+# Mirror — Slimme Spiegel
 
-Voice-powered smart mirror PWA. Ask how you look, get outfit opinions and compliments — in **Spanish**, **English** or **Dutch**.
+Nederlandse voice-powered smart mirror PWA. Vraag hoe je eruitziet, krijg meningen over stijl, haar en make-up — alles via spraak.
 
-100% free — uses browser Web Speech API, no paid services.
+100% gratis — gebruikt de Web Speech API van je browser, geen betaalde diensten.
 
-## Languages
+## Taal
 
-| Code | Language   |
-|------|------------|
-| `es` | Español    |
-| `en` | English    |
-| `nl` | Nederlands |
+De app is **alleen Nederlands** (nl-NL / nl-BE). Kies een Nederlandse of Vlaamse stem op het welkomstscherm.
 
-Select language on the welcome screen before starting. Voice list and speech recognition adapt automatically.
-
-## Run locally
+## Lokaal draaien
 
 ```bash
 npm start
 ```
 
-Open the URL shown in the terminal (e.g. http://localhost:3000).
+Open de URL in de terminal (bijv. http://localhost:3000).
 
-## Voice
+## Stemmen
 
-Choose a voice on the welcome screen or via the 🗣️ button during the mirror session. Preference is saved per language.
+- Alle `nl-NL` en `nl-BE` stemmen op je apparaat worden getoond
+- Stemmen met **Natuurlijker** (Google, Neural, Premium) staan bovenaan
+- Installeer extra stemmen via je telefoon- of PC-instellingen voor meer variatie
+- Tik op ▶ om een stem te testen vóór je start
 
-## PWA install
+## PWA installeren
 
-Use the 📲 button when available, or "Add to home screen" in your mobile browser.
-
-## Tech
-
-- Vanilla HTML / CSS / JS
-- Web Speech API (STT + TTS)
-- Front camera via `getUserMedia`
-- Local color analysis on canvas
-- Service Worker + manifest
+Op Android: menu ⋮ → App installeren.  
+Op iPhone: Delen ↑ → Zet op beginscherm.

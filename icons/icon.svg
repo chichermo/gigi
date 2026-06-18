@@ -9,5 +9,5 @@
   <circle cx="256" cy="220" r="120" fill="none" stroke="url(#g)" stroke-width="16"/>
   <circle cx="256" cy="220" r="80" fill="url(#g)" opacity="0.25"/>
   <text x="256" y="245" text-anchor="middle" font-size="90" fill="url(#g)">(</text>
-  <text x="256" y="420" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="72" font-weight="700" fill="#f8fafc">Marble</text>
+  <text x="256" y="420" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="72" font-weight="700" fill="#f8fafc">Mirror</text>
 </svg>

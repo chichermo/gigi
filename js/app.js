@@ -1,5 +1,5 @@
 /**
- * Marble — Espejo inteligente con voz
+ * Mirror — Espejo inteligente con voz
  */
 (() => {
   const STATE = {
@@ -51,11 +51,15 @@
   const voiceMobileGuide = $('#voice-mobile-guide');
   const voiceMobileGuideMirror = $('#voice-mobile-guide-mirror');
   const voiceDesktopNote = $('#voice-desktop-note');
+  const mirrorBrand = $('.mirror-brand');
   const langSelect = $('#lang-select');
+  const voiceCountWelcome = $('#voice-count');
+  const voiceCountMirror = $('#voice-count-mirror');
   const btnVoiceSettings = $('#btn-voice-settings');
   const voiceSettingsPanel = $('#voice-settings-panel');
 
   function init() {
+    I18n.setLang('nl');
     I18n.onChange = onLanguageChange;
     langSelect.value = I18n.getLang();
     langSelect.addEventListener('change', () => I18n.setLang(langSelect.value));
@@ -207,7 +211,7 @@
 
   function updateWakeHint() {
     if (!wakeHint) return;
-    const phrase = typeof WakeWord !== 'undefined' ? WakeWord.getPhrases() : 'Hoi Marble';
+    const phrase = typeof WakeWord !== 'undefined' ? WakeWord.getPhrases() : 'Hoi Mirror';
     wakeHint.textContent = I18n.t('wakeHint', { phrase });
   }
 
@@ -228,6 +232,7 @@
     document.querySelector('meta[name="description"]').content = I18n.t('metaDescription');
 
     appTitle.textContent = I18n.getAppName();
+    if (mirrorBrand) mirrorBrand.textContent = I18n.getAppName();
 
     document.querySelectorAll('[data-i18n]').forEach((el) => {
       const key = el.dataset.i18n;
@@ -321,6 +326,13 @@
   function populateVoiceLists() {
     const options = MarbleVoice.getVoicesForPicker();
     const selectedUri = MarbleVoice.getSelectedVoice()?.voiceURI;
+    const countText = options.length > 0
+      ? I18n.t('voiceCount', { count: options.length })
+      : '';
+
+    [voiceCountWelcome, voiceCountMirror].forEach((el) => {
+      if (el) el.textContent = countText;
+    });
 
     [voiceListWelcome, voiceListMirror].forEach((list) => {
       if (!list) return;
@@ -336,22 +348,24 @@
         return;
       }
 
-      options.forEach(({ voiceURI, label, langMatch, onPhone }) => {
+      options.forEach(({ voiceURI, label, langMatch, onPhone, isNatural }) => {
         const li = document.createElement('li');
         li.className = 'voice-list-item';
 
         const pickBtn = document.createElement('button');
         pickBtn.type = 'button';
         pickBtn.className = 'voice-option' + (voiceURI === selectedUri ? ' active' : '');
+        if (isNatural) pickBtn.classList.add('voice-option--natural');
         pickBtn.setAttribute('role', 'option');
         pickBtn.setAttribute('aria-selected', voiceURI === selectedUri ? 'true' : 'false');
 
         const langBadge = langMatch ? I18n.t('voiceLangMatch') : I18n.t('voiceOtherLang');
         const phoneBadge = onPhone ? ` · 📱 ${I18n.t('voiceOnDevice')}` : '';
+        const naturalBadge = isNatural ? ` · ✨ ${I18n.t('voiceQualityNatural')}` : '';
         pickBtn.innerHTML = `
           <span class="voice-option-main">
             <span class="voice-option-name">${label}</span>
-            <span class="voice-option-badge">${langBadge}${phoneBadge}</span>
+            <span class="voice-option-badge">${langBadge}${naturalBadge}${phoneBadge}</span>
           </span>
         `;
 
@@ -513,6 +527,7 @@
         return;
       }
       userName = name;
+      MarbleVoice.setUserName(userName);
       appState = STATE.READY;
       userGreeting.textContent = I18n.t('greetingUser', { name: userName });
       const confirm = MarbleBrain.getNameConfirm(userName);
@@ -565,7 +580,7 @@
       speaking: I18n.t('statusSpeaking'),
       idle: listenEnabled ? I18n.t('statusIdle') : I18n.t('statusMicPaused'),
       error: I18n.t('statusError'),
-      wake: I18n.t('statusWakeListening', { phrase: typeof WakeWord !== 'undefined' ? WakeWord.getPhrases() : 'Hoi Marble' }),
+      wake: I18n.t('statusWakeListening', { phrase: typeof WakeWord !== 'undefined' ? WakeWord.getPhrases() : 'Hoi Mirror' }),
     };
     statusText.textContent = labels[status] || I18n.t('statusIdle');
     avatarRing.classList.toggle('speaking', status === 'speaking');

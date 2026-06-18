@@ -1,5 +1,5 @@
 /**
- * Zinnen voor Marble — natuurlijk Nederlands (geen vertaling uit het Spaans).
+ * Zinnen voor Mirror — natuurlijk Nederlands (geen vertaling uit het Spaans).
  */
 const NlPhrases = {
   compliments: [

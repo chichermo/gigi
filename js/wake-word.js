@@ -1,30 +1,32 @@
 /**
- * Wake phrases — start Marble by voice (e.g. "Hey Mirror" / "Hoi Marble").
+ * Wake phrases — start Mirror by voice (e.g. "Hey Mirror" / "Hoi Mirror").
  */
 const WakeWord = (() => {
   const PATTERNS = {
     nl: [
+      /hoi\s+mirror/,
+      /hey\s+mirror/,
+      /hey\s+spiegel/,
+      /hoi\s+spiegel/,
+      /ha\s+mirror/,
+      /he\s+mirror/,
       /hoi\s+marble/,
       /hey\s+marble/,
-      /hey\s+mirror/,
-      /ha\s+marble/,
-      /hoi\s+spiegel/,
-      /hey\s+spiegel/,
-      /he\s+marble/,
     ],
     en: [
-      /hey\s+marble/,
       /hey\s+mirror/,
-      /hi\s+marble/,
       /hi\s+mirror/,
-      /hello\s+marble/,
+      /hello\s+mirror/,
+      /hey\s+marble/,
+      /hi\s+marble/,
     ],
     es: [
-      /hola\s+marble/,
-      /oye\s+marble/,
-      /hey\s+marble/,
+      /hola\s+mirror/,
       /hey\s+mirror/,
       /hola\s+espejo/,
+      /oye\s+mirror/,
+      /hola\s+marble/,
+      /hey\s+marble/,
     ],
   };
 
@@ -41,9 +43,9 @@ const WakeWord = (() => {
 
   function getPhrases() {
     const examples = {
-      nl: 'Hoi Marble',
+      nl: 'Hoi Mirror',
       en: 'Hey Mirror',
-      es: 'Hola Marble',
+      es: 'Hola Mirror',
     };
     return examples[I18n.getLang()] || examples.nl;
   }

@@ -1,6 +1,6 @@
 {
-  "name": "Marble — Smart Mirror",
-  "short_name": "Marble",
+  "name": "Mirror — Smart Mirror",
+  "short_name": "Mirror",
   "description": "Voice-powered smart mirror: style opinions and compliments",
   "id": "./",
   "start_url": "./index.html",

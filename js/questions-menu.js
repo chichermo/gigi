@@ -49,7 +49,7 @@ const QuestionMenu = {
       items: [
         { text: 'Sta ik goed voor een date?', icon: '💫', intent: 'date' },
         { text: 'Hoe heet ik?', icon: '🙋', intent: 'name' },
-        { text: 'Hallo Marble', icon: '👋', intent: 'greeting' },
+        { text: 'Hallo Mirror', icon: '👋', intent: 'greeting' },
         { text: 'Bedankt', icon: '🙂', intent: 'thanks' },
       ],
     },
@@ -101,7 +101,7 @@ const QuestionMenu = {
       items: [
         { text: '¿Voy bien para una cita?', icon: '💫', intent: 'date' },
         { text: '¿Cómo me llamo?', icon: '🙋', intent: 'name' },
-        { text: 'Hola Marble', icon: '👋', intent: 'greeting' },
+        { text: 'Hola Mirror', icon: '👋', intent: 'greeting' },
         { text: 'Gracias', icon: '🙂', intent: 'thanks' },
       ],
     },
@@ -153,7 +153,7 @@ const QuestionMenu = {
       items: [
         { text: 'Do I look good for a date?', icon: '💫', intent: 'date' },
         { text: "What's my name?", icon: '🙋', intent: 'name' },
-        { text: 'Hi Marble', icon: '👋', intent: 'greeting' },
+        { text: 'Hi Mirror', icon: '👋', intent: 'greeting' },
         { text: 'Thank you', icon: '🙂', intent: 'thanks' },
       ],
     },
